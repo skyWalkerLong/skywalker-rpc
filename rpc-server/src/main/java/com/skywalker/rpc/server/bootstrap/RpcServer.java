@@ -33,7 +33,7 @@ public class RpcServer implements ApplicationContextAware, InitializingBean{
     private Register register;
 
     /**
-     * 存放注册的接口
+     * 存放注册的接口名及实例
      */
     private Map<String,Object> handlerMap = new HashMap<>();
 
