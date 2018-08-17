@@ -2,6 +2,8 @@ package com.skywalker.rpc.server.bootstrap;
 
 import com.skywalker.rpc.registry.Register;
 import com.skywalker.rpc.server.annotation.RpcService;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -65,6 +67,9 @@ public class RpcServer implements ApplicationContextAware, InitializingBean{
      */
     @Override
     public void afterPropertiesSet() throws Exception {
+        EventLoopGroup bossGroup = new NioEventLoopGroup();
+        EventLoopGroup workerGroup = new NioEventLoopGroup();
+
 
     }
 
