@@ -2,8 +2,14 @@ package com.skywalker.rpc.server.bootstrap;
 
 import com.skywalker.rpc.registry.Register;
 import com.skywalker.rpc.server.annotation.RpcService;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -62,13 +68,44 @@ public class RpcServer implements ApplicationContextAware, InitializingBean{
     }
 
     /**
-     *
+     * 启动netty，服务器地址注册到第三方平台
      * @throws Exception
      */
     @Override
     public void afterPropertiesSet() throws Exception {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
+        try{
+            ServerBootstrap bootstrap = new ServerBootstrap();
+            bootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
+                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        public void initChannel(SocketChannel channel) throws Exception {
+                            channel.pipeline()
+                                    .addLast()
+                                    .addLast()
+                                    .addLast();
+                        }
+                    }).option(ChannelOption.SO_BACKLOG, 128)
+                    .childOption(ChannelOption.SO_KEEPALIVE, true);
+
+            String[] array = serverAddress.split(":");
+            String host = array[0];
+            int port = Integer.parseInt(array[1]);
+
+            ChannelFuture future = bootstrap.bind(host, port).sync();
+
+            log.debug("server started ! ip:{} ,port:{}",host,port);
+
+            if (register != null) {
+                register.register(serverAddress);
+            }
+
+            future.channel().closeFuture().sync();
+        } finally {
+            workerGroup.shutdownGracefully();
+            workerGroup.shutdownGracefully();
+        }
 
 
     }
