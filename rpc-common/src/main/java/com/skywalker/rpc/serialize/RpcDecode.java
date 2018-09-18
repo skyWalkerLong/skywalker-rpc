@@ -1,9 +1,11 @@
 package com.skywalker.rpc.serialize;
 
+import com.caucho.hessian.io.HessianInput;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 /**
@@ -41,7 +43,13 @@ public class RpcDecode extends ByteToMessageDecoder {
         byte[] data = new byte[dataLength];
         in.readBytes(data);
 
-        Object obj =
+        ByteArrayInputStream bis = new ByteArrayInputStream(data);
+
+        HessianInput hi = new HessianInput(bis);
+
+        Object obj = hi.readObject();
+
+        out.add(obj);
 
     }
 }

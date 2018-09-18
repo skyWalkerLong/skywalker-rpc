@@ -20,6 +20,7 @@
         <spring.context.version>5.0.8.RELEASE</spring.context.version>
         <slf4j.version>1.7.25</slf4j.version>
         <netty.version>5.0.0.Alpha2</netty.version>
+        <hession.version>4.0.38</hession.version>
     </properties>
 
     <dependencyManagement>
@@ -44,6 +45,14 @@
                 <artifactId>netty-all</artifactId>
                 <version>${netty.version}</version>
             </dependency>
+
+            <!-- https://mvnrepository.com/artifact/com.caucho/hessian -->
+            <dependency>
+                <groupId>com.caucho</groupId>
+                <artifactId>hessian</artifactId>
+                <version>${hession.version}</version>
+            </dependency>
+
 
 
         </dependencies>
