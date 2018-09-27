@@ -1,7 +1,12 @@
 package com.skywalker.rpc.server.bootstrap;
 
+import com.skywalker.rpc.po.RpcRequest;
+import com.skywalker.rpc.po.RpcResponse;
 import com.skywalker.rpc.registry.Register;
+import com.skywalker.rpc.serialize.RpcDecode;
+import com.skywalker.rpc.serialize.RpcEncode;
 import com.skywalker.rpc.server.annotation.RpcService;
+import com.skywalker.rpc.server.handler.RpcHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -55,6 +60,7 @@ public class RpcServer implements ApplicationContextAware, InitializingBean{
     /**
      * 将所有使用rpc注解的接口及实现对象存到handlerMap中
      * 该方法在RpcServer注册Bean时自动调用
+     * handlerMap中key为自定义的接口名称，value为对应实例
      * @param ctx
      */
     @Override
@@ -69,6 +75,7 @@ public class RpcServer implements ApplicationContextAware, InitializingBean{
 
     /**
      * 启动netty，服务器地址注册到第三方平台
+     * 绑定handle：反序列化request对象--> 从handlerMap中找到对应实例，调用指定方法 --> 结果封装到response后序列化发送客户端
      * @throws Exception
      */
     @Override
@@ -82,9 +89,9 @@ public class RpcServer implements ApplicationContextAware, InitializingBean{
                         @Override
                         public void initChannel(SocketChannel channel) throws Exception {
                             channel.pipeline()
-                                    .addLast()
-                                    .addLast()
-                                    .addLast();
+                                    .addLast(new RpcDecode(RpcRequest.class))
+                                    .addLast(new RpcEncode(RpcResponse.class))
+                                    .addLast(new RpcHandler(handlerMap));
                         }
                     }).option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
